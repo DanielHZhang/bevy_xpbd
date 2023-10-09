@@ -137,7 +137,7 @@ impl Plugin for PhysicsSetupPlugin {
         });
 
         // Create physics schedule, the schedule that advances the physics simulation
-        let mut physics_schedule = Schedule::default();
+        let mut physics_schedule = Schedule::new(PhysicsSchedule);
 
         physics_schedule
             .set_executor_kind(ExecutorKind::SingleThreaded)
@@ -157,7 +157,7 @@ impl Plugin for PhysicsSetupPlugin {
                 .chain(),
         );
 
-        app.add_schedule(PhysicsSchedule, physics_schedule);
+        app.add_schedule(physics_schedule);
 
         app.add_systems(
             schedule.dyn_clone(),
@@ -165,7 +165,7 @@ impl Plugin for PhysicsSetupPlugin {
         );
 
         // Create substep schedule, the schedule that runs the inner substepping loop
-        let mut substep_schedule = Schedule::default();
+        let mut substep_schedule = Schedule::new(SubstepSchedule);
 
         substep_schedule
             .set_executor_kind(ExecutorKind::SingleThreaded)
@@ -188,7 +188,7 @@ impl Plugin for PhysicsSetupPlugin {
                 .chain(),
         );
 
-        app.add_schedule(SubstepSchedule, substep_schedule);
+        app.add_schedule(substep_schedule);
 
         app.add_systems(
             PhysicsSchedule,
@@ -197,7 +197,7 @@ impl Plugin for PhysicsSetupPlugin {
 
         // Create the PostProcessCollisions schedule for user-defined systems
         // that filter and modify collisions.
-        let mut post_process_collisions_schedule = Schedule::default();
+        let mut post_process_collisions_schedule = Schedule::new(PostProcessCollisions);
 
         post_process_collisions_schedule
             .set_executor_kind(ExecutorKind::SingleThreaded)
@@ -206,7 +206,7 @@ impl Plugin for PhysicsSetupPlugin {
                 ..default()
             });
 
-        app.add_schedule(PostProcessCollisions, post_process_collisions_schedule);
+        app.add_schedule(post_process_collisions_schedule);
 
         app.add_systems(
             SubstepSchedule,
